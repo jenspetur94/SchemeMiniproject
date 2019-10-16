@@ -1,0 +1,10 @@
+#lang racket
+
+(define students (car (file->list "students.txt")))
+
+(define (create-group-by-counting sl k)
+  (if (null? sl)
+      sl
+      (let ([grouping (cons 1  (car sl))])
+        grouping
+

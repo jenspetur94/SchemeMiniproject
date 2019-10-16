@@ -1,0 +1,63 @@
+- Read from file
+	-format in to list of students
+
+-function that returns group from grouping, in addition:
+	- a function that returns number of groups in a grouping
+	- a function that returns the maximum group size
+	- minimum group size in a grouping
+
+- single student
+	- constructor
+	- predicate
+	- selection
+
+ groups
+	- constructor function for single group
+	- group predicate function
+	- selector function that returns list of stugsldents in a group
+	- selector function that returns group id
+
+ grouping
+	- group from grouping
+	- number of groups in grouping
+	- maximum group size
+ 	- minimum group size
+
+the grouping functions will serve as grouping constructor functions
+	-write a predicate that identifies a grouping object.
+
+
+write pretty printing functions for students, groups and groupings
+
+
+Random group:
+given list of students sl and list of desired group sizes gsl , program function that form groups of lengths prescribed in gsl. 
+	- should assert that  gsl list g1 + g2 .. + gk = length sl.
+	- should start by making g1 in gsl 
+	- should be random
+	- should use recursion
+
+Groupings by counting:
+should use counting to create k groups. marks every student with the counting and creates a grouping object out of it.
+
+Balanced grouping by counting:
+a variant of grouping by counting that that should create k groups from n students and ensure equal distribution of sex and ethnicality.
+
+sort by age and enticity
+
+Random grouping with group predicate:
+like random group it should create random groups and check if they all fullfill a given predicate. If they don't it should be redone. up to a 1000 times
+funktionen er en funktion hved siden af der checker om en given gruppe opfylder et given predicate. lav gruppe, check funktion
+(create-group-by-counting students 6)
+
+'(10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10)
+
+'(5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5)
+
+'(3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 2)
+
+(random-grouping-with-predicate all-group-members-are-female students '(5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5))
+
+
+
+ 
