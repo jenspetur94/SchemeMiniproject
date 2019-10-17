@@ -137,19 +137,24 @@
 
 #| groupings |#
 
+;returns a group from a grouping
 (define (group-from-grouping id grouping [group '()])
   (cond [(null? grouping) group]
         [(= id (groupid-of-student (car grouping))) (group-from-grouping id (cdr grouping) (append group (list (car grouping))))]
         [else (group-from-grouping id (cdr grouping) group)]))
 
+;returns all group id's in a grouping
 (define (groups-in-grouping grouping [group-ids '()])
   (cond [(null? grouping) group-ids]
         [(member (groupid-of-student (car grouping)) group-ids) (groups-in-grouping (cdr grouping) group-ids)]
         [else (groups-in-grouping (cdr grouping) (append group-ids (list (groupid-of-student (car grouping)))))]))
 
+;returns number of groups in a grouping
 (define (number-of-groups-in-grouping grouping)
   (length (groups-in-grouping grouping)))
 
+
+;returns maximum group size in a grouping
 (define (max-group-size-in-grouping grouping)
   (let ([group-ids (groups-in-grouping grouping)])
     (max-group-size-in-grouping-helper grouping (cdr group-ids) (length (group-from-grouping (car group-ids) grouping)))))
@@ -162,6 +167,7 @@
         (max-group-size-in-grouping-helper grouping (cdr group-ids) size)
         (max-group-size-in-grouping-helper grouping (cdr group-ids) max-size)))))
 
+;returns minimum group size in a grouping
 (define (min-group-size-in-grouping grouping)
   (let ([group-ids (groups-in-grouping grouping)])
     (min-group-size-in-grouping-helper grouping (cdr group-ids) (length (group-from-grouping (car group-ids) grouping)))))
@@ -173,37 +179,74 @@
         (if (< size min-size)
         (min-group-size-in-grouping-helper grouping (cdr group-ids) size)
         (min-group-size-in-grouping-helper grouping (cdr group-ids) min-size)))))
+
 #| groups |#
 
+;returns all students in a group without group id appended to them
+(define (group-members-of-group group)
+  (if (group? group)
+      (group-members-of-group-helper group)
+      (error "not a group")))
+
+(define (group-members-of-group-helper group [sl '()])
+  (if(null? group)
+      sl
+     (let ([student (check-if-student-and-remove-group (car group))]
+            [new-gl (cdr group)])
+       (group-members-of-group-helper new-gl (append sl (list student))))))
+
+      
+
 ;gets the ids of all group members
-(define (ids-of-group-members group [ids '()])
-  (if (null? group)
-      ids
-      (ids-of-group-members (cdr group)(append ids (list (id-of-student (car group)))))))
+(define (id-of-group-members group [id '()])
+  (if (group? group)
+      (id-of-student (car group))
+      (error "not a group")))
 
 ;gets the name of all group members
-(define (name-of-group-members group [names '()])
+(define (name-of-group-members group)
+  (if (group? group)
+      (name-of-group-members-helper group '())
+      (error "not a group")))
+      
+(define (name-of-group-members-helper group names)
   (if (null? group)
       names
-      (name-of-group-members (cdr group)(append names (list (name-of-student (car group)))))))
+      (name-of-group-members-helper (cdr group)(append names (list (name-of-student (car group)))))))
 
 ;gets the gender of all group members
-(define (gender-of-group-members group [genders '()])
+(define (gender-of-group-members group)
+  (if (group? group)
+      (gender-of-group-members-helper group '())
+      (error "not a group")))
+
+(define (gender-of-group-members-helper group genders)
   (if (null? group)
       genders
-      (gender-of-group-members (cdr group)(append genders (list (gender-of-student (car group)))))))
+      (gender-of-group-members-helper (cdr group)(append genders (list (gender-of-student (car group)))))))
 
 ;gets the gender of all group members
-(define (nationality-of-group-members group [nationalities '()])
+(define (nationality-of-group-members group)
+  (if (group? group)
+      (nationality-of-group-members-helper group '())
+      (error "not a group")))
+
+(define (nationality-of-group-members-helper group nationalities)
   (if (null? group)
       nationalities
-      (nationality-of-group-members (cdr group)(append nationalities (list (nationality-of-student (car group)))))))
+      (nationality-of-group-members-helper (cdr group)(append nationalities (list (nationality-of-student (car group)))))))
 
 ;gets the ages of all group members
-(define (ages-of-group-members group [ages '()])
+
+(define (ages-of-group-members group)
+  (if (group? group)
+      (ages-of-group-members-helper group '())
+      (error "not a group")))
+
+(define (ages-of-group-members-helper group ages)
   (if (null? group)
       ages
-      (ages-of-group-members (cdr group)(append ages (list (age-of-student (car group)))))))
+      (ages-of-group-members-helper (cdr group)(append ages (list (age-of-student (car group)))))))
 
 #| students |#
 
@@ -251,23 +294,53 @@
 
 #| PREDICATE FUNCTIONS |#
 
+#| Grouping |#
+
+;returns true if input is a grouping
+(define (grouping? grouping)
+  (if (or (null? grouping) (group? grouping))
+      #f
+      (grouping-helper? grouping)))
+
+(define (grouping-helper? grouping)
+  (if(null? grouping)
+      #t
+     (let ([student (car grouping)])
+       (if(and (student? student) (is-in-group? student))
+          (grouping-helper? (cdr grouping))
+          #f))))
+
+#| Group |#
+
 (define (atleast-3-students-22-years-older group)
   (atleast-n-students-a-years-older 3 22 group))
+
 
 (define (atleast-n-students-a-years-older n a group [ns 0])
   (cond [(null? group) (>= ns n)]
         [(>= (age-of-student (car group)) a) (atleast-n-students-a-years-older n a (cdr group) (+ ns 1))]
         [else (atleast-n-students-a-years-older n a (cdr group) ns)]))
 
+;returns true if no group members are of same age
 (define (no-group-members-are-of-same-age group)
   (not (check-duplicates (ages-of-group-members group '()))))
 
-
-;(define (group? group)
- ; (
+;returns true if input is a group
+(define (group? group)
+  (if (null? group)
+      #f
+      (let ([student (car group)])
+        (if(and (student? student) (number? (car student)))
+           (group?-helper (cdr group) (car student))
+           #f))))
       
-;(define (group?-helper group id)
-  ;(if (and (student? (car group) ()))
+(define (group?-helper group id)
+  (if (null? group)
+     #t
+     (let ([student (car group)])
+       (if (and (student? student) (= id (groupid-of-student student)))
+           (group?-helper (cdr group) id)
+           #f))))
 
 ;returns true if all group members are female
 (define (all-group-members-are-female group)
@@ -277,6 +350,8 @@
 (define (has-one-female group)
   (ormap female? group))
 
+
+#| students |#
 
 ;returns true if the student is a female
 (define (female? st)
@@ -302,3 +377,43 @@
                      (or (string=? gender "male") (string=? gender "female"))
                      (string? etni)
                      (and (number? age) (positive? age))))]))
+
+
+#| PRETTY PRINTING |#
+
+;pretty print a student
+(define (print-student st)
+  (let ([student (check-if-student-and-remove-group st)])
+    (writeln
+     (list-concat
+      (for/list ([s student]
+                 [prefix '("id: " " name: " " gender: " " nationality: " " age: ")])
+        (if (number? s)
+            (string-append prefix (number->string s))
+            (string-append prefix s)))))))
+
+(define (list-concat lst [str ""])
+  (if (null? lst)
+      str
+      (list-concat (cdr lst)(string-append str (car lst)))))
+
+;pretty prints a group
+(define (print-group group)
+  (if (group? group)
+      (for ([i 3])
+        (cond [(= i 1) (writeln (string-append "group number: "(number->string (groupid-of-student (car group)))))]
+              [(= i 2) (for/list ([st group])
+                      (print-student st))]
+              [else (display (string-append "\n \n" (string-append (make-string 40 #\#) "\n \n")))]))
+      (error "not a group")))
+
+;pretty prints grouping
+(define (print-grouping grouping)
+  (if (grouping? grouping)
+      (for ([i 2])
+        (if (= i 0)
+            (writeln (string-append "number of groups in grouping: " (number->string(number-of-groups-in-grouping grouping))))
+            (for/list ([groupid (groups-in-grouping grouping)])
+              (print-group (group-from-grouping groupid grouping)))))
+      (error "Not a grouping")))
+      
